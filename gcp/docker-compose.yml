@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  config-storage:
+    build: .
+    image: gcp-config-storage
+    entrypoint: config-storage
+    environment:
+      - GCS_BUCKET=cw-config
+      - PATH_PREFIX=config-storage/test
+      - GCP_KEY_FILE_PATH=/secrets/key.json
+    volumes:
+      - ./secrets:/secrets
+      - .:/tmp
