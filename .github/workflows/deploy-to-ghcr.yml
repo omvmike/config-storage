@@ -8,6 +8,7 @@ on:
     paths:
       - 'gcp/Dockerfile'
       - 'gcp/gcp-config-storage.sh'
+      - '.github/workflows/deploy-to-ghcr.yml'
 
 jobs:
   deploy:
