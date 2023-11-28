@@ -30,7 +30,7 @@ jobs:
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/gcp-config-storage:latest
           # If your Dockerfile is not in the repository root, specify the path
-          context: gcp/Dockerfile
+          context: gcp/
 
       - name: Verify deployment
         run: echo "Image deployed to GitHub Container Registry"
