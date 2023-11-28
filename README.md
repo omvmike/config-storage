@@ -96,3 +96,58 @@ services:
       - ./secrets:/secrets
       - .:/tmp
 ```
+
+### Bitbucket pipelines samples
+
+Sample of bitbucket-pipelines.yml file for GCP
+
+
+```yaml
+dev:
+  - step:
+      name: Obtain environment variables
+      image: ghcr.io/omvmike/config-storage:gcp
+      script:
+        - export GCP_KEY_FILE=$KEY_FILE_BASE64
+        - export GCS_BUCKET=my-bucket
+        - export PATH_PREFIX=config-storage/dev
+        - config-storage get .env api.env
+      artifacts:
+        - api.env
+```
+it will bethe same for AWS,
+just change image name to `ghcr.io/omvmike/config-storage:aws`
+and provide `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables instead of `GCP_KEY_FILE`
+
+```yaml
+dev:
+  - step:
+      name: Obtain environment variables
+      image: ghcr.io/omvmike/config-storage:aws
+      script:
+        - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+        - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+        - export AWS_BUCKET=my-bucket
+        - export PATH_PREFIX=config-storage/dev
+        - config-storage get .env api.env
+      artifacts:
+        - api.env
+```
+
+For AWS you can use `oidc` option to get temporary credentials from AWS STS service.
+
+
+```yaml
+  dev:
+    - step: 
+        name: Obtain environment variables
+        image: ghcr.io/omvmike/config-storage:aws
+        oidc: true
+        script:
+          - export AWS_OIDC_ROLE_ARN=arn:aws:iam::123456789012:role/MyRoleName
+          - export PATH_PREFIX=config-storage/dev
+          - export AWS_BUCKET=my-bucket
+          - config-storage get .env api.env
+        artifacts:
+          - api.env
+```

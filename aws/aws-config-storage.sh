@@ -122,7 +122,7 @@ fi
 
 
 if [ -n "$AWS_OIDC_ROLE_ARN" ] && [ -n "$BITBUCKET_STEP_OIDC_TOKEN" ]; then
-    echo "Using Bitbucket OIDC Token for AWS Authentication"
+    echo "Setting Bitbucket OIDC Token for AWS Authentication"
 
     timestamp=$(date +%Y%m%d-%H%M%S)
     # Set the OIDC token and AWS Role ARN
@@ -144,12 +144,11 @@ if [ -n "$AWS_OIDC_ROLE_ARN" ] && [ -n "$BITBUCKET_STEP_OIDC_TOKEN" ]; then
     export AWS_SECRET_ACCESS_KEY
     AWS_SESSION_TOKEN=$(echo "$creds" | jq -r '.SessionToken')
     export AWS_SESSION_TOKEN
-    echo "OIDC credentials set"
 fi
 
 
 echo "Using the following configuration:"
-echo "- AWS credentials: ${aws_profile:-AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY used}" ${AWS_SESSION_TOKEN:+"-- OIDC token used"}
+echo "- AWS credentials: ${aws_profile:-AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY used}" ${AWS_SESSION_TOKEN:+"-- given with OIDC"}
 echo "- bucket: $bucket"
 echo "- prefix: $prefix"
 
