@@ -2,17 +2,12 @@ version: '3.8'
 
 services:
   config-storage:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/omvmike/config-storage:aws
+    entrypoint: config-storage
     environment:
-      # You can use AWS_PROFILE (aws cli named profile) or AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to authenticate
-      - AWS_PROFILE=omvmike
+      - AWS_OIDC_ROLE_ARN=arn:aws:iam::123456789012:role/role-name
       - AWS_BUCKET=test.boomr
-#      - AWS_ACCESS_KEY_ID=your_access_key
-#      - AWS_SECRET_ACCESS_KEY=your_secret_key
       - PATH_PREFIX=config-storage/test
     volumes:
       - ./:/tmp
       - ~/.aws:/root/.aws
-#    command: [ "set", ".env", "/files/.env" ]

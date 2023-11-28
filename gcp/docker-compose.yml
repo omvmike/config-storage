@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   config-storage:
-    build: .
-    image: gcp-config-storage
+    image: ghcr.io/omvmike/config-storage:gcp
     entrypoint: config-storage
     environment:
       - GCS_BUCKET=cw-config

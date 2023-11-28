@@ -120,8 +120,26 @@ if [ "$#" -lt 2 ]; then
     about
 fi
 
+if [ -n "$AWS_OIDC_ROLE_ARN" ]; then
+    echo "Assuming role: $AWS_OIDC_ROLE_ARN"
+    role_session_name="SomeSessionName" # You can customize this session name
+
+    # Assume role and get temporary credentials
+    creds=$(aws sts assume-role --role-arn "$AWS_OIDC_ROLE_ARN" --role-session-name "$role_session_name" --query 'Credentials' --output json)
+
+    # Set temporary credentials for subsequent AWS CLI commands
+    AWS_ACCESS_KEY_ID=$(echo "$creds" | jq -r '.AccessKeyId')
+    export AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY=$(echo "$creds" | jq -r '.SecretAccessKey')
+    export AWS_SECRET_ACCESS_KEY
+    AWS_SESSION_TOKEN=$(echo "$creds" | jq -r '.SessionToken')
+    export AWS_SESSION_TOKEN
+    echo "OIDC credentials set"
+fi
+
+
 echo "Using the following configuration:"
-echo "- AWS credentials: ${aws_profile:-AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY used}"
+echo "- AWS credentials: ${aws_profile:-AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY used}" ${AWS_SESSION_TOKEN:+"-- OIDC token used"}
 echo "- bucket: $bucket"
 echo "- prefix: $prefix"
 
