@@ -120,12 +120,22 @@ if [ "$#" -lt 2 ]; then
     about
 fi
 
-if [ -n "$AWS_OIDC_ROLE_ARN" ]; then
-    echo "Assuming role: $AWS_OIDC_ROLE_ARN"
-    role_session_name="SomeSessionName" # You can customize this session name
 
-    # Assume role and get temporary credentials
-    creds=$(aws sts assume-role --role-arn "$AWS_OIDC_ROLE_ARN" --role-session-name "$role_session_name" --query 'Credentials' --output json)
+if [ -n "$AWS_OIDC_ROLE_ARN" ] && [ -n "$BITBUCKET_STEP_OIDC_TOKEN" ]; then
+    echo "Using Bitbucket OIDC Token for AWS Authentication"
+
+    timestamp=$(date +%Y%m%d-%H%M%S)
+    # Set the OIDC token and AWS Role ARN
+    oidc_token=$BITBUCKET_STEP_OIDC_TOKEN
+    aws_role_arn=$AWS_OIDC_ROLE_ARN
+
+    # Assume the AWS role using the OIDC token
+    creds=$(aws sts assume-role-with-web-identity \
+                --role-arn "$aws_role_arn" \
+                --role-session-name "BitbucketSession" \
+                --web-identity-token "$oidc_token" \
+                --query 'Credentials' \
+                --output json)
 
     # Set temporary credentials for subsequent AWS CLI commands
     AWS_ACCESS_KEY_ID=$(echo "$creds" | jq -r '.AccessKeyId')
