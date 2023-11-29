@@ -21,7 +21,13 @@ Whe `2023-11-28` is date and `121822` is time `HHMMSS` when the file was saved.
 ## Usage
 Use `config-storage` to manage config files within cloud buckets.
 
-You can use docker container or shell script.
+There are 2 docker images for AWS and GCP cloud providers respectively:
+- `ghcr.io/omvmike/config-storage:aws` for AWS
+- `ghcr.io/omvmike/config-storage:gcp` for GCP
+
+You can use docker container or shell script from `aws` or `gcp` folders to manage your config files.
+
+> Note: the scripts supports different authorisation methods for AWS and GCP.
 
 Docker container is more preferable because it contains all necessary dependencies and can be used in CI/CD pipelines.
 
@@ -63,11 +69,16 @@ services:
   config-storage:
     image: ghcr.io/omvmike/config-storage:aws
     environment:
+      # AWS_PROFILE is used to get credentials from ~/.aws folder
+      # it's convenient for local development
       - AWS_PROFILE=omvmike
       - AWS_BUCKET=my-bucket
+      - PATH_PREFIX=config-storage/test
+      # Using AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY is more convenient for CI/CD pipelines
       #      - AWS_ACCESS_KEY_ID=your_access_key
       #      - AWS_SECRET_ACCESS_KEY=your_secret_key
-      - PATH_PREFIX=config-storage/test
+      # If you using Bitbucket pipelines you can use oidc option to get temporary credentials from AWS STS service
+      #      - AWS_OIDC_ROLE_ARN=arn:aws:iam::123456789012:role/MyRoleName  
     volumes:
       - ./:/tmp
       - ~/.aws:/root/.aws
@@ -81,6 +92,9 @@ It is container internal path to your GCP key file. So you can use volume option
 
 Also container use `/tmp` folder as a working directory. 
 So you can mount your project folder to container `/tmp` to use relative paths in your config files.
+
+You can provide authorisation key file as a base64 string in `GCP_KEY_FILE` environment variable.
+Alternatively, you can use `GCP_KEY_FILE_PATH` environment variable to provide path to your key file.
 
 ```yaml
 version: '3.8'
